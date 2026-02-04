@@ -347,6 +347,7 @@
             <div class="s-in">
                 <input type="text" id="sin" placeholder="Sender suchen..." onkeydown="if(event.key==='Enter') search()">
                 <button class="s-btn" onclick="search()"><i class="fas fa-search"></i></button>
+                <button class="s-btn" onclick="playRandom()" style="margin-left:8px;" title="Zufälliger Sender"><i class="fas fa-dice"></i></button>
             </div>
         </div>
         <div class="grid" id="g"></div>
@@ -625,6 +626,29 @@
             document.querySelectorAll('.card').forEach(c => c.classList.remove('playing'));
             updateMediaSessionMetadata(s.name, "NexusFM Radio", logoUrl);
             startMetaLoop();
+        }
+
+        // NEU: Zufalls-Sender Funktion
+        async function playRandom() {
+            const btn = document.querySelector('.fa-dice').parentElement;
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            // Hole Top 100 Sender, damit wir keinen "toten" Sender erwischen
+            const url = 'https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/de?limit=100&order=clickcount&reverse=true';
+
+            try {
+                const r = await fetch(url);
+                const d = await r.json();
+                if (d.length > 0) {
+                    const randomStation = d[Math.floor(Math.random() * d.length)];
+                    playStation(randomStation);
+                }
+            } catch(e) {
+                console.error("Random play failed", e);
+            } finally {
+                btn.innerHTML = originalIcon;
+            }
         }
 
         function initAudioContext() {
