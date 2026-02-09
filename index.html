@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
-    <script src="redirect.js"></script>
+    <meta name="google-site-verification" content="938GfiRqqJIRS1OnDQKgKwox4LtR5ICf6xRYQYhy_24" />
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusFM</title>
+    <title>NexusFM | Radio, Podcasts & Musik</title>
+    <meta name="description" content="Höre NexusFM, Podcasts und Musik weltweit. Die moderne Web-Radio-App mit Sleep-Timer, Equalizer und aktuellen News.">
+    <meta name="keywords" content="NexusFM, Radio, Webstream, Podcast, Musik, News">
+    <meta name="author" content="Nexus">
+    
+    <meta property="og:title" content="NexusFM - Höre was du liebst">
+    <meta property="og:description" content="Die All-in-One Web-App für Radio, Musik und Podcasts.">
+    <meta property="og:image" content="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn">
+    <meta property="og:type" content="website">
 
-<link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1ViHwf320k1R7PADP_7KqMOJKNnaUMVIC">
-<link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1ViHwf320k1R7PADP_7KqMOJKNnaUMVIC">
+    <script src="redirect.js"></script>
 
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="NexusFM">
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1ViHwf320k1R7PADP_7KqMOJKNnaUMVIC">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1ViHwf320k1R7PADP_7KqMOJKNnaUMVIC">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="NexusFM">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -26,6 +35,7 @@
             --text: #ffffff;
             --text-muted: #aaaaaa;
             --danger: #e74c3c;
+            --pill-bg: #121212;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
 
@@ -36,7 +46,7 @@
             margin: 0; padding-bottom: 130px; 
             overflow-x: hidden; 
             min-height: 100vh;
-            overscroll-behavior-y: none; /* Verhindert Pull-to-Refresh Effekt */
+            overscroll-behavior-y: none;
         }
 
         /* ANIMIERTER HINTERGRUND */
@@ -47,6 +57,12 @@
             animation: bgShift 10s ease-in-out infinite alternate;
         }
         @keyframes bgShift { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+        /* NEUE ANIMATION FÜR TEXT-FARBVERLAUF */
+        @keyframes textFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
 
         /* TICKER */
         .t-wrap {
@@ -60,6 +76,19 @@
         .t-c { display: inline-block; padding-left: 100%; font-size: 12px; font-weight: 800; line-height: 32px; animation: marquee 40s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
+        /* FADE OVERLAYS */
+        .fade-edge {
+            position: fixed; left: 0; width: 100%; height: 60px; pointer-events: none; z-index: 2100;
+        }
+        .fade-top {
+            top: 32px; 
+            background: linear-gradient(to bottom, var(--b) 0%, transparent 100%);
+        }
+        .fade-bottom {
+            bottom: 0;
+            background: linear-gradient(to top, var(--b) 0%, transparent 100%);
+        }
+
         /* HEADER */
         header { 
             padding: 15px 20px; display: flex; align-items: center; justify-content: space-between;
@@ -67,9 +96,40 @@
         }
         .menu-btn { font-size: 24px; color: var(--y); cursor: pointer; filter: drop-shadow(0 0 8px var(--y-glow)); transition: 0.2s; }
         .menu-btn:active { transform: scale(0.9); }
-        .header-logo { height: 60px; max-width: 200px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); }
+        .header-logo { height: 60px; max-width: 200px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); cursor: pointer; }
 
-        /* SIDEBAR (Angepasst für Flexbox) */
+        /* AI BUTTON STYLES */
+        @keyframes border-flow { from { background-position: 0% 0, 0% 0; } to { background-position: 0% 0, 200% 0; } }
+        .ai-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; color: #fff;
+            background: var(--pill-bg);
+            border: 1px solid transparent;
+            background-image: linear-gradient(var(--pill-bg), var(--pill-bg)), linear-gradient(90deg, transparent, #007aff, #00f2ff, #007aff, transparent);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            background-size: 200% 100%;
+            animation: border-flow 1.5s linear infinite;
+            box-shadow: 0 0 15px rgba(0, 122, 255, 0.4);
+            transition: transform 0.2s ease;
+        }
+        .ai-btn:active { transform: scale(0.9); }
+
+        /* AI OVERLAY */
+        #ai-overlay-page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 10000; display: none;
+            flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #ai-overlay-page.active { display: flex; transform: translateY(0); }
+        .ai-header-bar {
+            height: 60px; background: #111; display: flex; align-items: center; 
+            padding: 0 20px; border-bottom: 1px solid #222; justify-content: space-between;
+        }
+        .ai-frame { flex: 1; border: none; width: 100%; }
+
+        /* SIDEBAR */
         #sidebar {
             position: fixed; top: 0; left: 0; width: 280px; height: 100%;
             background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -77,16 +137,12 @@
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); 
             padding: 60px 20px; border-right: 1px solid var(--glass-border);
             box-shadow: 10px 0 40px rgba(0,0,0,0.5);
-            display: flex; /* Neu */
-            flex-direction: column; /* Neu */
-            overflow-y: auto; /* Falls der Inhalt zu hoch wird */
         }
         #sidebar.open { transform: translateX(0); }
         .side-item { 
             padding: 18px; font-size: 16px; font-weight: 600; color: var(--text-muted); 
             border-radius: 12px; margin-bottom: 8px; cursor: pointer; 
             display: flex; align-items: center; gap: 15px; transition: 0.2s; 
-            flex-shrink: 0;
         }
         .side-item:hover, .side-item.active { background: rgba(241, 196, 15, 0.1); color: var(--y); border: 1px solid rgba(241, 196, 15, 0.1); }
         #overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index: 4500; display:none; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s; }
@@ -96,6 +152,44 @@
         .page { display: none; padding: 0 15px; animation: fadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* HOME SPECIFIC */
+        .home-hero { padding: 20px 5px; }
+        .home-hero p { color: var(--text-muted); margin: 5px 0 0; font-size: 14px; }
+        
+        .section-head { display: flex; justify-content: space-between; align-items: center; margin: 25px 0 15px; padding: 0 5px; }
+        .section-head h2 { font-size: 18px; margin: 0; color: #fff; }
+        .view-all { color: var(--y); font-size: 13px; font-weight: 700; text-decoration: none; }
+
+        .quick-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .nav-card { 
+            background: var(--glass); border: 1px solid var(--glass-border); border-radius: 15px; 
+            padding: 15px 5px; text-align: center; cursor: pointer; transition: 0.2s;
+        }
+        .nav-card i { font-size: 20px; color: var(--y); margin-bottom: 8px; display: block; }
+        .nav-card span { font-size: 12px; font-weight: 600; }
+        .nav-card:active { transform: scale(0.95); background: rgba(241, 196, 15, 0.1); }
+
+        /* OFFICIAL STATION CARD */
+        .official-card {
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.15), rgba(20, 20, 20, 0.8));
+            border: 1px solid var(--y);
+            border-radius: 20px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0 25px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(241, 196, 15, 0.1);
+            transition: 0.3s;
+        }
+        .official-card:active { transform: scale(0.98); }
+        .off-left { display: flex; align-items: center; gap: 15px; }
+        .off-img { width: 45px; height: 45px; border-radius: 10px; background: #000; border: 1px solid var(--y); }
+        .off-info h3 { margin: 0; font-size: 18px; color: #fff; letter-spacing: 0.5px; }
+        .off-info p { margin: 2px 0 0; font-size: 11px; color: var(--y); font-weight: 700; text-transform: uppercase; }
+        .off-play { width: 40px; height: 40px; border-radius: 50%; background: var(--y); color: #000; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 0 15px var(--y-glow); }
 
         /* SEARCH */
         .s-box { padding: 10px 0 25px; position: sticky; top: 32px; z-index: 20; }
@@ -128,7 +222,7 @@
         .fav-icon { position: absolute; top: 8px; right: 8px; font-size: 14px; color: rgba(255,255,255,0.3); padding: 5px; z-index: 5; transition: 0.2s; }
         .fav-icon.active { color: var(--y); transform: scale(1.1); filter: drop-shadow(0 0 5px var(--y)); }
 
-        /* NEWS */
+        /* NEWS & PODCAST ITEMS */
         .news-card { 
             background: var(--glass); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
             border: 1px solid var(--glass-border); border-left: 4px solid var(--y); 
@@ -138,12 +232,13 @@
         .news-card h3 { margin: 0 0 8px 0; font-size: 16px; color: #fff; }
         .news-card p { margin: 0; font-size: 13px; color: var(--text-muted); }
 
-        #news-detail {
+        #news-detail, #podcast-detail {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 8000; display: none;
             flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease;
         }
-        #news-detail.active { transform: translateX(0); }
+        #news-detail.active, #podcast-detail.active { transform: translateX(0); }
+        
         .news-header-bar {
             flex-shrink: 0; height: 60px; background: rgba(20,20,20,0.95);
             border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 20px;
@@ -191,17 +286,16 @@
 
         .p-btn { background: var(--y); color: #000; border: 0; width: 42px; height: 42px; border-radius: 50%; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 15px rgba(241,196,15,0.3); transition: 0.2s; }
 
-        /* FULL PLAYER - FIXED & SCROLL FREE */
+        /* FULL PLAYER */
         #full-player {
             position: fixed; top: 0; left: 0; width: 100%; 
-            height: 100dvh; /* Dynamic Viewport Height */
+            height: 100dvh; 
             background: linear-gradient(to bottom, #1a1a1a, #000); 
             z-index: 9000;
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
             text-align: center;
             transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0, 1);
-            overflow: hidden; /* Prevent scrolling */
-            overscroll-behavior: none;
+            overflow: hidden; overscroll-behavior: none;
         }
         #full-player.active { transform: translateY(0); }
 
@@ -209,7 +303,6 @@
         .close-fp { font-size: 26px; color: #fff; padding: 20px; cursor: pointer; opacity: 0.8; }
         .menu-dots { font-size: 18px; color: #fff; padding: 20px; cursor: pointer; opacity: 0.8; transition: 0.2s; }
         
-        /* Flex container for the image to scale */
         .fp-content-wrap {
             flex: 1; width: 100%; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; overflow: hidden;
@@ -233,7 +326,7 @@
         .fp-info div { 
             font-size: 16px; color: var(--y); font-weight: 600; opacity: 0.9; text-shadow: 0 0 10px rgba(241,196,15,0.3); 
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; text-overflow: ellipsis;
+            overflow: hidden; text-overflow: ellipsis; 
         }
 
         .visualizer { display: flex; gap: 5px; height: 30px; align-items: flex-end; justify-content: center; margin-bottom: 20px; flex-shrink: 0; }
@@ -319,9 +412,18 @@
 
         .opt-close-btn { width: 100%; padding: 15px; background: transparent; border: 1px solid #333; color: #888; border-radius: 15px; font-size: 16px; margin-top: 10px; }
 
+        /* SEEKBAR STYLES */
+        .fp-seek-container {
+            width: 85%; max-width: 400px; margin-bottom: 20px; display: none;
+        }
+        .fp-seek-time {
+            display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 8px; font-weight: 600; font-feature-settings: "tnum";
+        }
+        .fp-seek-bar { width: 100%; cursor: pointer; }
+
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <div class="bg-anim"></div>
 
@@ -330,37 +432,113 @@
         <div class="t-container"><div class="t-c" id="ticker-content">+++ NEXUSFM +++</div></div>
     </div>
 
+    <div class="fade-edge fade-top"></div>
+    <div class="fade-edge fade-bottom"></div>
+
     <div id="overlay" onclick="toggleMenu()"></div>
-    
     <div id="sidebar">
         <h2 style="color:var(--y); margin-bottom: 40px; font-size:26px; letter-spacing:-1px; display:flex; align-items:center; gap:10px;">
             <img src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" style="height:30px;"> NEXUS
         </h2>
-        <div class="side-item active" onclick="showPage('radio')"><i class="fas fa-broadcast-tower"></i> Radio Player</div>
+        <div class="side-item active" onclick="showPage('home')"><i class="fas fa-home"></i> Startseite</div>
+        <div class="side-item" onclick="showPage('radio')"><i class="fas fa-broadcast-tower"></i> Radio Player</div>
         <div class="side-item" onclick="showPage('favorites')"><i class="fas fa-heart"></i> Favoriten</div>
         <div class="side-item" onclick="showPage('rcs')"><i class="fas fa-newspaper"></i> Nachrichten</div>
+        <div class="side-item" onclick="showPage('podcasts')"><i class="fas fa-podcast"></i> Podcasts</div>
+        <div class="side-item" onclick="showPage('music')"><i class="fas fa-music"></i> Musik [BETA]</div>
         <div class="side-item" onclick="showPage('about')"><i class="fas fa-info-circle"></i> Über uns</div>
-
-        <div style="flex: 1;"></div>
-
-        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; text-align: center; margin-bottom: 20px;">
-            <i class="fas fa-exclamation-triangle" style="color: var(--y); font-size: 24px; margin-bottom: 10px; opacity: 0.8;"></i>
-            
-            <p style="font-size: 11px; color: #aaa; margin: 0 0 15px 0; line-height: 1.4;">
-                Dies ist eine Demo-Version und ist keine öffentliche Version und es kann zu Bugs kommen. Diese Version bietet kein gutes Benutzererlebnis.
-            </p>
-            
-            <a href="https://nexusfm-cdcr.vercel.app/" style="display: block; background: var(--y); color: #000; text-decoration: none; padding: 10px 0; border-radius: 8px; font-weight: 700; font-size: 12px; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-                Zur öffentlichen Version wechseln
-            </a>
-        </div>
+        <div class="side-item" onclick="shareApp()" style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 25px;"><i class="fas fa-share-alt"></i> Teilen</div>
     </div>
+
     <header>
-        <i class="fas fa-bars menu-btn" onclick="toggleMenu()"></i>
-        <img src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" class="header-logo" alt="NexusFM">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fas fa-bars menu-btn" onclick="toggleMenu()"></i>
+            <div class="ai-btn" onclick="openAI()" title="KI Assistent">
+                <i class="fas fa-robot"></i>
+            </div>
+        </div>
+        <img src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" class="header-logo" alt="NexusFM" onclick="showPage('home')">
     </header>
 
-    <div id="page-radio" class="page active">
+    <div id="ai-overlay-page">
+        <div class="ai-header-bar">
+            <div style="display: flex; align-items: center; gap: 10px; color: #00f2ff; font-weight: bold;">
+                <i class="fas fa-robot"></i> KI ASSISTENT
+            </div>
+            <i class="fas fa-times" onclick="closeAI()" style="color: #fff; font-size: 24px; cursor: pointer; padding: 5px;"></i>
+        </div>
+        <iframe src="https://ki-assistent-alpha.vercel.app/" class="ai-frame"></iframe>
+    </div>
+
+    <div id="page-home" class="page active">
+        <div class="home-hero">
+            <h1 style="background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #4285f4); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: textFlow 4s linear infinite; display: inline-block; font-family: sans-serif; font-weight: bold; margin: 0;">
+                Hallo Entdecker!
+            </h1>
+            <p>Was möchtest du heute hören?</p>
+        </div>
+
+        <div class="quick-nav">
+            <div class="nav-card" onclick="showPage('radio')">
+                <i class="fas fa-broadcast-tower"></i>
+                <span>Radio</span>
+            </div>
+            <div class="nav-card" onclick="showPage('podcasts')">
+                <i class="fas fa-podcast"></i>
+                <span>Podcast</span>
+            </div>
+            <div class="nav-card" onclick="showPage('music')">
+                <i class="fas fa-music"></i>
+                <span>Musik</span>
+            </div>
+        </div>
+
+        <div class="section-head">
+            <h2>Der offizielle NexusFM-Sender</h2>
+        </div>
+        <div class="official-card" onclick="playOfficialStream()">
+            <div class="off-left">
+                <img src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" class="off-img">
+                <div class="off-info">
+                    <h3>NexusFM</h3>
+                    <p>Official Stream</p>
+                </div>
+            </div>
+            <div class="off-play">
+                <i class="fas fa-play"></i>
+            </div>
+        </div>
+
+        <div class="section-head">
+            <h2>NexusFM - Rock Version</h2>
+        </div>
+        <div class="official-card" onclick="playRockStream()">
+            <div class="off-left">
+                <img src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" class="off-img">
+                <div class="off-info">
+                    <h3>NexusFM</h3>
+                    <p>Rock Version</p>
+                </div>
+            </div>
+            <div class="off-play">
+                <i class="fas fa-play"></i>
+            </div>
+        </div>
+
+        <div class="section-head">
+            <h2>Top News</h2>
+            <a href="#" class="view-all" onclick="event.preventDefault(); showPage('rcs')">Alle ansehen</a>
+        </div>
+        <div id="home-news-preview">Lade News...</div>
+
+        <div class="section-head">
+            <h2>Deine Favoriten</h2>
+            <a href="#" class="view-all" onclick="event.preventDefault(); showPage('favorites')">Alle ansehen</a>
+        </div>
+        <div class="grid" id="home-fav-preview">Keine Favoriten.</div>
+    </div>
+
+    <div id="page-radio" class="page">
         <div class="s-box">
             <div class="s-in">
                 <input type="text" id="sin" placeholder="Sender suchen..." onkeydown="if(event.key==='Enter') search()">
@@ -381,6 +559,30 @@
         <div id="news-feed">Lade Nachrichten...</div>
     </div>
 
+    <div id="page-podcasts" class="page">
+        <div class="s-box">
+            <div class="s-in">
+                <input type="text" id="pod-search" placeholder="Podcast suchen..." onkeydown="if(event.key==='Enter') searchPodcasts()">
+                <button class="s-btn" onclick="searchPodcasts()"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <div class="grid" id="pod-grid">
+            <div style="grid-column:1/-1;text-align:center;color:#666;padding:20px;">Lade Vorschläge...</div>
+        </div>
+    </div>
+
+    <div id="page-music" class="page">
+        <div class="s-box">
+            <div class="s-in">
+                <input type="text" id="music-search" placeholder="Song oder Künstler..." onkeydown="if(event.key==='Enter') searchMusic()">
+                <button class="s-btn" onclick="searchMusic()"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <div class="grid" id="music-grid">
+            <div style="grid-column:1/-1;text-align:center;color:#666;padding:20px;">Lade Vorschläge...</div>
+        </div>
+    </div>
+
     <div id="page-about" class="page">
         <h2 style="color:var(--y); padding-left:5px;">Über NexusFM</h2>
         
@@ -388,6 +590,7 @@
             <img src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" style="width: 80px; margin-bottom: 15px; border-radius: 50%;">
             <p style="font-size: 16px; margin-bottom: 20px;">Das Radio-Erlebnis der nächsten Generation.</p>
             <a href="https://nexus-ashy.vercel.app/" target="_blank" class="about-link">Mehr von uns besuchen <i class="fas fa-external-link-alt" style="margin-left:5px; font-size:12px;"></i></a>
+            <a href="https://youtube.com/@techniqquest12?si=8Jh6YLfgChHEfKw_" target="_blank" class="about-link" style="background: #ff0000; color: #fff; margin-left: 10px;">YouTube besuchen <i class="fab fa-youtube" style="margin-left:5px; font-size:12px;"></i></a>
         </div>
 
         <div class="about-box">
@@ -399,10 +602,10 @@
                 <p>Diese Anwendung speichert keine personenbezogenen Daten auf externen Servern. Einstellungen wie Favoriten, Lautstärke oder der Dark-Mode-Status werden ausschließlich lokal auf Ihrem Endgerät (Local Storage) gespeichert.</p>
 
                 <h3>2. Audio-Streaming</h3>
-                <p>Beim Abspielen eines Radiosenders wird eine direkte Verbindung zwischen Ihrem Gerät und dem Server des jeweiligen Senders hergestellt. Hierbei wird Ihre IP-Adresse an den Sender übermittelt, was technisch für das Streaming notwendig ist.</p>
+                <p>Beim Abspielen eines Radiosenders oder Podcasts wird eine direkte Verbindung zwischen Ihrem Gerät und dem Server des jeweiligen Anbieters hergestellt. Hierbei wird Ihre IP-Adresse technisch bedingt übermittelt.</p>
 
                 <h3>3. Externe Inhalte</h3>
-                <p>Nachrichten und Bilder werden über öffentliche APIs geladen. Hierbei gelten die Datenschutzbestimmungen der jeweiligen Anbieter.</p>
+                <p>Nachrichten, Podcasts und Bilder werden über öffentliche APIs (iTunes, Radio-Browser, RSS2Json, Jamendo) geladen. Hierbei gelten die Datenschutzbestimmungen der jeweiligen Anbieter.</p>
                 
                 <p style="margin-top:20px; font-style:italic;">Stand: Februar 2026.</p>
             </div>
@@ -414,6 +617,21 @@
             <i class="fas fa-arrow-left"></i> <span style="margin-left:10px; font-size:16px;">ZURÜCK</span>
         </div>
         <div class="news-content-scroll" id="detail-body"></div>
+    </div>
+
+    <div id="podcast-detail">
+        <div class="news-header-bar" onclick="closePodcastDetail()">
+            <i class="fas fa-arrow-left"></i> <span style="margin-left:10px; font-size:16px;">ZURÜCK</span>
+        </div>
+        
+        <div style="padding: 20px; text-align: center; background: linear-gradient(to bottom, #1a1a1a, #000);">
+            <img id="pd-img" src="" style="width: 120px; height: 120px; border-radius: 15px; margin-bottom: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.5);">
+            <h2 id="pd-title" style="margin: 0; color: #fff; font-size: 18px;">Titel</h2>
+            <p id="pd-author" style="color: var(--y); font-size: 13px; margin: 5px 0 0;">Autor</p>
+        </div>
+
+        <div class="news-content-scroll" id="pd-episodes" style="padding: 0 15px 50px;">
+            </div>
     </div>
 
     <div class="player" id="mini-player" onclick="openFull()">
@@ -442,6 +660,14 @@
             <div class="fp-info">
                 <h2 id="f-name">NexusFM</h2>
                 <div id="f-track">Wähle einen Sender</div>
+            </div>
+
+            <div class="fp-seek-container" id="seek-container">
+                <div class="fp-seek-time">
+                    <span id="time-current">0:00</span>
+                    <span id="time-duration">0:00</span>
+                </div>
+                <input type="range" id="seek-bar" class="fp-seek-bar" min="0" max="100" value="0" step="0.1" oninput="seekAudio(this.value)">
             </div>
 
             <div class="visualizer" id="viz">
@@ -489,7 +715,7 @@
                 <div class="sec-head">
                     <span><i class="fas fa-sliders-h"></i> Equalizer & Sound</span>
                 </div>
-                <div style="font-size:11px; color:#666; margin-bottom:10px;">Funktioniert nur bei unterstützten Sendern.</div>
+                <div style="font-size:11px; color:#666; margin-bottom:10px;">Funktioniert nur bei unterstützten Formaten.</div>
                 <div class="grid-opts">
                     <button class="opt-btn eq-btn sel" onclick="setEQ('flat', this)">Normal</button>
                     <button class="opt-btn eq-btn" onclick="setEQ('bass', this)">Bass</button>
@@ -517,6 +743,34 @@
     <audio id="a" crossorigin="anonymous"></audio>
 
     <script>
+        // KLON-SCHUTZ & DOMAIN-LOCK
+        (function() {
+            const allowed = ['nexusfm-cdcr.vercel.app', 'localhost', '127.0.0.1'];
+            if (!allowed.includes(window.location.hostname) && window.location.hostname !== "") {
+                document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;color:white;text-align:center;padding:20px;font-family:sans-serif;'><h1>Zugriff verweigert</h1><p>Diese Applikation darf nur auf der offiziellen NexusFM Domain ausgeführt werden.</p></div>";
+                window.location.href = "https://google.com";
+            }
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'i' || e.key === 'j' || e.key === 'c' || e.key === 'k')) e.preventDefault();
+                if (e.key === 'F12') e.preventDefault();
+            });
+        })();
+
+        // AI OVERLAY FUNCTIONS
+        function openAI() {
+            const aiOverlay = document.getElementById('ai-overlay-page');
+            aiOverlay.style.display = 'flex';
+            setTimeout(() => aiOverlay.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAI() {
+            const aiOverlay = document.getElementById('ai-overlay-page');
+            aiOverlay.classList.remove('active');
+            setTimeout(() => aiOverlay.style.display = 'none', 400);
+            document.body.style.overflow = '';
+        }
+
         const a = document.getElementById('a');
         const defaultLogo = "https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn";
         let currentStation = null, metaInt;
@@ -530,6 +784,7 @@
         let bassFilter, midFilter, trebleFilter;
         let isAudioCtxInit = false;
 
+        // UI Elements
         const els = {
             g: document.getElementById('g'),
             favG: document.getElementById('fav-grid'),
@@ -545,8 +800,26 @@
             stDisplay: document.getElementById('st-display'),
             stStatus: document.getElementById('st-status'),
             stCancel: document.getElementById('st-cancel'),
-            saverCheck: document.getElementById('data-saver')
+            saverCheck: document.getElementById('data-saver'),
+            // Podcast Elements
+            podGrid: document.getElementById('pod-grid'),
+            podDetail: document.getElementById('podcast-detail'),
+            pdImg: document.getElementById('pd-img'),
+            pdTitle: document.getElementById('pd-title'),
+            pdAuthor: document.getElementById('pd-author'),
+            pdEpisodes: document.getElementById('pd-episodes'),
+            // Music Elements
+            musicGrid: document.getElementById('music-grid'),
+            // Home Elements
+            homeNews: document.getElementById('home-news-preview'),
+            homeFavs: document.getElementById('home-fav-preview'),
+            // Seek Elements
+            seekCont: document.getElementById('seek-container'),
+            seekBar: document.getElementById('seek-bar'),
+            timeCur: document.getElementById('time-current'),
+            timeDur: document.getElementById('time-duration')
         };
+        let currentPodcastImage = "";
 
         els.saverCheck.checked = dataSaverMode;
 
@@ -572,6 +845,28 @@
             updateMediaSessionState("paused");
         });
 
+        // SEEKBAR LOGIC
+        a.addEventListener('timeupdate', () => {
+            if (currentStation) return; // Nicht bei Radio
+            if (!isNaN(a.duration)) {
+                const progress = (a.currentTime / a.duration) * 100;
+                els.seekBar.value = progress;
+                els.timeCur.innerText = formatTime(a.currentTime);
+                els.timeDur.innerText = formatTime(a.duration);
+            }
+        });
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60);
+            return `${m}:${s < 10 ? '0' + s : s}`;
+        }
+
+        function seekAudio(val) {
+            if (currentStation || isNaN(a.duration)) return;
+            a.currentTime = (val / 100) * a.duration;
+        }
+
         function toggleMenu() {
             els.sidebar.classList.toggle('open');
             if(els.sidebar.classList.contains('open')) {
@@ -589,14 +884,45 @@
             document.getElementById('page-' + pid).classList.add('active');
 
             const items = document.querySelectorAll('.side-item');
-            if(pid === 'radio') items[0].classList.add('active');
-            if(pid === 'favorites') items[1].classList.add('active');
-            if(pid === 'rcs') items[2].classList.add('active');
-            if(pid === 'about') items[3].classList.add('active');
+            if(pid === 'home') items[0].classList.add('active');
+            if(pid === 'radio') items[1].classList.add('active');
+            if(pid === 'favorites') items[2].classList.add('active');
+            if(pid === 'rcs') items[3].classList.add('active');
+            if(pid === 'podcasts') items[4].classList.add('active');
+            if(pid === 'music') items[5].classList.add('active');
+            if(pid === 'about') items[6].classList.add('active');
 
-            toggleMenu();
+            if(els.sidebar.classList.contains('open')) toggleMenu();
+            
+            if(pid === 'home') updateHome();
             if(pid === 'favorites') loadFavs();
             if(pid === 'rcs' && newsData.length === 0) fetchNews();
+            if(pid === 'radio' && els.g.children.length === 0) load();
+            if(pid === 'podcasts' && els.podGrid.innerText.includes("Vorschläge")) searchPodcasts("Top");
+            if(pid === 'music' && els.musicGrid.innerText.includes("Vorschläge")) searchMusic("Top");
+        }
+
+        // --- HOME UPDATES ---
+        function updateHome() {
+            // Update News Preview
+            if(newsData.length > 0) {
+                els.homeNews.innerHTML = newsData.slice(0, 3).map((item, index) => `
+                    <div class="news-card" onclick="openNewsDetail(${index})">
+                        <h3>${item.title}</h3>
+                        <p>${item.pubDate.split(' ')[1]} Uhr</p>
+                    </div>
+                `).join('');
+            } else {
+                fetchNews();
+            }
+
+            // Update Fav Preview
+            els.homeFavs.innerHTML = "";
+            if(favorites.length === 0) {
+                els.homeFavs.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#666;padding:10px;">Keine Favoriten gespeichert.</div>';
+            } else {
+                favorites.slice(0, 3).forEach(s => els.homeFavs.appendChild(createCard(s)));
+            }
         }
 
         async function load(q = "") {
@@ -629,6 +955,7 @@
         }
 
         function playStation(s) {
+            els.seekCont.style.display = "none"; // Radio -> Keine Seekbar
             initAudioContext();
             currentStation = s;
             a.src = s.url_resolved;
@@ -646,15 +973,31 @@
             startMetaLoop();
         }
 
-        // NEU: Zufalls-Sender Funktion
+        function playOfficialStream() {
+            const officialStation = {
+                name: "NexusFM",
+                url_resolved: "https://nexusfm-stream.stream.laut.fm/nexusfm-stream?t302=2026-02-07_17-59-42&uuid=5f192ba7-f4e1-42ab-baa6-65ce268c6444",
+                favicon: defaultLogo,
+                stationuuid: "official-nexus-fm"
+            };
+            playStation(officialStation);
+        }
+
+        function playRockStream() {
+            const rockStation = {
+                name: "NexusFM - Rock Version",
+                url_resolved: "https://nexusfm-stream-rock-version.stream.laut.fm/nexusfm-stream-rock-version?t302=2026-02-08_16-41-41&uuid=f4421568-2c05-4532-aaf6-20efe7de257e",
+                favicon: defaultLogo,
+                stationuuid: "official-nexus-fm-rock"
+            };
+            playStation(rockStation);
+        }
+
         async function playRandom() {
             const btn = document.querySelector('.fa-dice').parentElement;
             const originalIcon = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-            // Hole Top 100 Sender, damit wir keinen "toten" Sender erwischen
             const url = 'https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/de?limit=100&order=clickcount&reverse=true';
-
             try {
                 const r = await fetch(url);
                 const d = await r.json();
@@ -662,11 +1005,8 @@
                     const randomStation = d[Math.floor(Math.random() * d.length)];
                     playStation(randomStation);
                 }
-            } catch(e) {
-                console.error("Random play failed", e);
-            } finally {
-                btn.innerHTML = originalIcon;
-            }
+            } catch(e) { console.error("Random play failed", e); } 
+            finally { btn.innerHTML = originalIcon; }
         }
 
         function initAudioContext() {
@@ -746,8 +1086,7 @@
         function updateMediaSessionMetadata(title, artist, artworkUrl) {
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
-                    // HIER IST DIE KORREKTUR: Komma am Ende hinzugefügt
-                    title: "Jetzt läuft: " + title + " | NexusFM",
+                    title: title + " | NexusFM",
                     artist: artist,
                     artwork: [
                         { src: artworkUrl, sizes: '96x96', type: 'image/png' },
@@ -770,12 +1109,12 @@
             if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             
             if(a.paused) { 
-                // CRITICAL FIX: Reload Stream on Resume to get Live Edge
-                // This fixes the issue where playback stops after pausing
-                const currentSrc = a.src;
-                a.src = "";
-                a.src = currentSrc;
-                a.load();
+                if(currentStation) {
+                    const currentSrc = a.src;
+                    a.src = "";
+                    a.src = currentSrc;
+                    a.load();
+                }
                 a.play(); 
                 updatePlayIcons(true); 
             } 
@@ -820,7 +1159,6 @@
                 const song = sData[0].last_song || "NexusFM";
                 els.ti.innerText = els.ft.innerText = song;
                 
-                // Update Notification Artist/Title dynamically
                 if ('mediaSession' in navigator) {
                     navigator.mediaSession.metadata.artist = song;
                 }
@@ -832,6 +1170,7 @@
             handleFavLogic(station, uuid);
             icon.classList.toggle('active');
             updateFavIconInFullPlayer(uuid);
+            if(document.getElementById('page-home').classList.contains('active')) updateHome();
         }
 
         function toggleCurrentFav() {
@@ -839,6 +1178,7 @@
             handleFavLogic(currentStation, currentStation.stationuuid);
             updateFavIconInFullPlayer(currentStation.stationuuid);
             if(document.getElementById('page-favorites').classList.contains('active')) loadFavs();
+            if(document.getElementById('page-home').classList.contains('active')) updateHome();
             load(document.getElementById('sin').value); 
         }
 
@@ -871,6 +1211,7 @@
                     newsData = data.items;
                     document.getElementById('ticker-content').textContent = `+++ ${newsData.slice(0, 5).map(i => i.title.toUpperCase()).join(' +++ ')} +++ `;
                     renderNews();
+                    if(document.getElementById('page-home').classList.contains('active')) updateHome();
                 }
             } catch (e) { }
         }
@@ -906,19 +1247,126 @@
             document.body.style.overflow = '';
         }
 
+        async function searchPodcasts(q = "") {
+            const query = q || document.getElementById('pod-search').value;
+            if(!query) return;
+            els.podGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#666;"><i class="fas fa-spinner fa-spin"></i> Suche...</div>';
+            try {
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=podcast&entity=podcast&limit=30`);
+                const data = await res.json();
+                els.podGrid.innerHTML = "";
+                if(data.results.length === 0) {
+                    els.podGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#666;">Keine Ergebnisse.</div>';
+                    return;
+                }
+                data.results.forEach(pod => {
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.innerHTML = `<img src="${pod.artworkUrl600 || pod.artworkUrl100}" loading="lazy"><span>${pod.collectionName}</span>`;
+                    div.onclick = () => openPodcast(pod.feedUrl, pod.collectionName, pod.artistName, pod.artworkUrl600);
+                    els.podGrid.appendChild(div);
+                });
+            } catch(e) { els.podGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--danger);">Fehler beim Laden.</div>'; }
+        }
+
+        async function openPodcast(feedUrl, title, artist, imgUrl) {
+            els.pdImg.src = imgUrl; els.pdTitle.innerText = title; els.pdAuthor.innerText = artist;
+            els.pdEpisodes.innerHTML = '<div style="text-align:center; padding:30px; color:#666;"><i class="fas fa-spinner fa-spin"></i> Lade Episoden...</div>';
+            currentPodcastImage = imgUrl; els.podDetail.style.display = 'flex';
+            setTimeout(() => els.podDetail.classList.add('active'), 10);
+            try {
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`);
+                const data = await res.json();
+                if(data.status !== 'ok') throw new Error('Feed parsing failed');
+                els.pdEpisodes.innerHTML = "";
+                data.items.forEach((ep) => {
+                    const audioUrl = ep.enclosure.link; if(!audioUrl) return;
+                    const row = document.createElement('div');
+                    row.className = 'news-card'; row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '15px'; row.style.padding = '15px';
+                    row.innerHTML = `<div style="flex:1;"><h3 style="font-size:14px; margin-bottom:4px; line-height:1.4;">${ep.title}</h3><p style="font-size:11px; opacity:0.6;">${ep.pubDate.split(' ')[0]}</p></div><button class="p-btn" style="width:36px; height:36px; font-size:12px;" onclick="event.stopPropagation(); playEpisode('${audioUrl}', '${ep.title.replace(/'/g, "\\'")}')"><i class="fas fa-play"></i></button>`;
+                    els.pdEpisodes.appendChild(row);
+                });
+            } catch(e) { els.pdEpisodes.innerHTML = '<div style="text-align:center; padding:30px; color:var(--danger);">Fehler beim Laden.</div>'; }
+        }
+
+        function closePodcastDetail() { els.podDetail.classList.remove('active'); setTimeout(() => els.podDetail.style.display = 'none', 300); }
+
+        function playEpisode(url, title) {
+            els.seekCont.style.display = "block"; // Podcast -> Seekbar anzeigen
+            if(metaInt) clearInterval(metaInt); metaInt = null; currentStation = null; 
+            initAudioContext(); a.src = url; a.play();
+            els.mini.classList.add('visible'); els.pn.innerText = els.fn.innerText = title; els.ti.innerText = els.ft.innerText = els.pdTitle.innerText;
+            els.pi.src = currentPodcastImage; els.fi.src = currentPodcastImage;
+            els.pt.className = els.ptf.className = "fas fa-spinner fa-spin";
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('playing'));
+            updateMediaSessionMetadata(title, els.pdTitle.innerText, currentPodcastImage);
+            els.fpFav.style.color = "#fff"; 
+        }
+
+        async function searchMusic(q = "") {
+            const query = q || document.getElementById('music-search').value;
+            if(!query) return;
+            els.musicGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#666;"><i class="fas fa-spinner fa-spin"></i> Suche auf Jamendo...</div>';
+            const clientId = "56d30862"; 
+            const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${clientId}&format=json&limit=30&search=${encodeURIComponent(query)}&include=musicinfo&order=buzzrate_desc`;
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if(!data.results || data.results.length === 0) {
+                    els.musicGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#666;">Keine Songs gefunden.</div>';
+                    return;
+                }
+                els.musicGrid.innerHTML = "";
+                data.results.forEach(track => {
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    const artwork = track.image || defaultLogo;
+                    div.innerHTML = `<img src="${artwork}" loading="lazy"><span>${track.name}</span><small style="color:var(--y); font-size:10px;">${track.artist_name}</small>`;
+                    div.onclick = () => playMusicTrack(track.audio, track.name, track.artist_name, artwork);
+                    els.musicGrid.appendChild(div);
+                });
+            } catch(e) { els.musicGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--danger);">API-Verbindung fehlgeschlagen.</div>'; }
+        }
+
+        function playMusicTrack(url, title, artist, imgUrl) {
+            els.seekCont.style.display = "block"; // Musik -> Seekbar anzeigen
+            if(metaInt) clearInterval(metaInt); metaInt = null; currentStation = null; 
+            initAudioContext(); a.src = url; a.play();
+            els.mini.classList.add('visible'); els.pn.innerText = els.fn.innerText = title; els.ti.innerText = els.ft.innerText = artist;
+            els.pi.src = imgUrl; els.fi.src = imgUrl;
+            els.pt.className = els.ptf.className = "fas fa-spinner fa-spin";
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('playing'));
+            updateMediaSessionMetadata(title, artist, imgUrl);
+            els.fpFav.style.color = "#fff"; 
+        }
+
         function search() { load(document.getElementById('sin').value); }
 
+        function shareApp() {
+            const shareText = "Höre Podcast, Musik und Radio auf NexusFM:\nhttps://nexusfm-cdcr.vercel.app/";
+            if (navigator.share) {
+                navigator.share({
+                    title: 'NexusFM',
+                    text: shareText
+                }).catch(err => console.log('Fehler beim Teilen:', err));
+            } else {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert("Link wurde in die Zwischenablage kopiert!");
+                }).catch(() => {
+                    alert("Teilen fehlgeschlagen.");
+                });
+            }
+            toggleMenu();
+        }
+        
+        // INITIALIZE
         fetchNews();
-        load();
+        updateHome();
     </script>
 
 <div style="text-align: center; margin-top: 20px; padding: 10px;">
-    <p style="color: #888888; font-size: 12px; margin: 0;">
-        Version 164.01.15
-    </p>
-    <p style="color: #666666; font-size: 10px; margin-top: 5px; opacity: 0.7;">
-        By Nexus with ❤️
-    </p>
+    <p style="color: #888888; font-size: 12px; margin: 0;">Version 169.57</p>
+    <p style="color: #666666; font-size: 10px; margin-top: 5px; opacity: 0.7;">By Nexus with ❤️</p>
 </div>
 
 </body>
