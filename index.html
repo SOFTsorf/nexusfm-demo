@@ -1,925 +1,233 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
-    <script src="redirect.js"></script>
-
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusFM</title>
-
-<link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1ViHwf320k1R7PADP_7KqMOJKNnaUMVIC">
-<link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1ViHwf320k1R7PADP_7KqMOJKNnaUMVIC">
-
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="NexusFM">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusFM | Dein Sound-Netzwerk</title>
     <style>
-        :root { 
-            --y: #f1c40f; 
-            --y-glow: rgba(241, 196, 15, 0.5);
-            --b: #000000; 
-            --glass: rgba(20, 20, 20, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text: #ffffff;
-            --text-muted: #aaaaaa;
-            --danger: #e74c3c;
+        :root {
+            --nexus-neon: #00d2ff;
+            --nexus-purple: #92fe9d; /* Sanfter Verlauf */
+            --bg-dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; 
-            background: var(--b);
-            color: var(--text);
-            margin: 0; padding-bottom: 130px; 
-            overflow-x: hidden; 
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at top, #1e293b, var(--bg-dark));
+            color: #f8fafc;
             min-height: 100vh;
-            overscroll-behavior-y: none; /* Verhindert Pull-to-Refresh Effekt */
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* ANIMIERTER HINTERGRUND */
-        .bg-anim {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
-            background: radial-gradient(circle at 10% 20%, #1a1a00 0%, #000 40%),
-                        radial-gradient(circle at 90% 80%, #1a1100 0%, #000 40%);
-            animation: bgShift 10s ease-in-out infinite alternate;
-        }
-        @keyframes bgShift { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
-
-        /* TICKER */
-        .t-wrap {
-            position: sticky; top: 0; z-index: 2500;
-            background: var(--y); color: #000;
-            height: 32px; display: flex; align-items: center;
-            box-shadow: 0 5px 20px rgba(241, 196, 15, 0.2);
-        }
-        .t-l { background: #000; color: var(--y); padding: 0 12px; font-weight: 900; font-size: 10px; z-index: 30; height: 100%; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 1px; }
-        .t-container { flex: 1; overflow: hidden; white-space: nowrap; position: relative; height: 100%; background: var(--y); }
-        .t-c { display: inline-block; padding-left: 100%; font-size: 12px; font-weight: 800; line-height: 32px; animation: marquee 40s linear infinite; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-
-        /* HEADER */
-        header { 
-            padding: 15px 20px; display: flex; align-items: center; justify-content: space-between;
-            position: relative; z-index: 10;
-        }
-        .menu-btn { font-size: 24px; color: var(--y); cursor: pointer; filter: drop-shadow(0 0 8px var(--y-glow)); transition: 0.2s; }
-        .menu-btn:active { transform: scale(0.9); }
-        .header-logo { height: 60px; max-width: 200px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); }
-
-        /* SIDEBAR (Angepasst für Flexbox) */
-        #sidebar {
-            position: fixed; top: 0; left: 0; width: 280px; height: 100%;
-            background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            z-index: 5000; transform: translateX(-100%);
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); 
-            padding: 60px 20px; border-right: 1px solid var(--glass-border);
-            box-shadow: 10px 0 40px rgba(0,0,0,0.5);
-            display: flex; /* Neu */
-            flex-direction: column; /* Neu */
-            overflow-y: auto; /* Falls der Inhalt zu hoch wird */
-        }
-        #sidebar.open { transform: translateX(0); }
-        .side-item { 
-            padding: 18px; font-size: 16px; font-weight: 600; color: var(--text-muted); 
-            border-radius: 12px; margin-bottom: 8px; cursor: pointer; 
-            display: flex; align-items: center; gap: 15px; transition: 0.2s; 
-            flex-shrink: 0;
-        }
-        .side-item:hover, .side-item.active { background: rgba(241, 196, 15, 0.1); color: var(--y); border: 1px solid rgba(241, 196, 15, 0.1); }
-        #overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index: 4500; display:none; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s; }
-        #overlay.show { opacity: 1; }
-
-        /* PAGES */
-        .page { display: none; padding: 0 15px; animation: fadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* SEARCH */
-        .s-box { padding: 10px 0 25px; position: sticky; top: 32px; z-index: 20; }
-        .s-in { 
-            display: flex; background: var(--glass); border-radius: 16px; padding: 6px; 
-            border: 1px solid var(--glass-border); align-items: center; backdrop-filter: blur(10px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: all 0.3s;
-        }
-        .s-in:focus-within { border-color: var(--y); box-shadow: 0 0 15px rgba(241, 196, 15, 0.15); }
-        input { flex: 1; background: 0; border: 0; color: #fff; padding: 12px 15px; outline: 0; font-size: 16px; }
-        .s-btn { background: var(--y); border: 0; width: 44px; height: 44px; border-radius: 12px; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: 0.2s; }
-        .s-btn:active { transform: scale(0.95); }
-
-        /* GRID */
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 20px; }
-        .card { 
-            background: var(--glass); border-radius: 18px; padding: 15px 8px; 
-            text-align: center; border: 1px solid var(--glass-border); 
-            position: relative; overflow: hidden; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-            backdrop-filter: blur(5px);
-        }
-        .card:active { transform: scale(0.95); }
-        .card.playing { 
-            border-color: var(--y); 
-            background: linear-gradient(135deg, rgba(241,196,15,0.15), rgba(0,0,0,0.4)); 
-            box-shadow: 0 0 20px rgba(241, 196, 15, 0.1);
-        }
-        .card img { width: 50px; height: 50px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
-        .card span { font-size: 11px; font-weight: 700; color: #e0e0e0; display: block; line-height: 1.3; height: 2.6em; overflow: hidden; }
-        .fav-icon { position: absolute; top: 8px; right: 8px; font-size: 14px; color: rgba(255,255,255,0.3); padding: 5px; z-index: 5; transition: 0.2s; }
-        .fav-icon.active { color: var(--y); transform: scale(1.1); filter: drop-shadow(0 0 5px var(--y)); }
-
-        /* NEWS */
-        .news-card { 
-            background: var(--glass); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
-            border: 1px solid var(--glass-border); border-left: 4px solid var(--y); 
-            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.2s;
-        }
-        .news-card:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
-        .news-card h3 { margin: 0 0 8px 0; font-size: 16px; color: #fff; }
-        .news-card p { margin: 0; font-size: 13px; color: var(--text-muted); }
-
-        #news-detail {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 8000; display: none;
-            flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease;
-        }
-        #news-detail.active { transform: translateX(0); }
-        .news-header-bar {
-            flex-shrink: 0; height: 60px; background: rgba(20,20,20,0.95);
-            border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 20px;
-            gap: 15px; color: var(--y); font-size: 18px; font-weight: bold; cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-        .news-content-scroll { flex: 1; overflow-y: auto; padding: 25px 20px 50px; }
-
-        /* ABOUT PAGE */
-        .about-box {
-            background: var(--glass); border-radius: 18px; padding: 25px; margin-bottom: 20px;
-            border: 1px solid var(--glass-border);
-        }
-        .about-link {
-            display: inline-block; background: var(--y); color: #000; font-weight: 700;
-            padding: 12px 20px; border-radius: 10px; text-decoration: none; margin-top: 10px;
-        }
-        .legal-text { font-size: 13px; color: #aaa; line-height: 1.6; }
-        .legal-text h3 { color: #fff; margin-top: 20px; font-size: 15px; }
-
-        /* PLAYERS */
-        .player {
-            position: fixed; bottom: 20px; left: 15px; right: 15px;
-            background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
-            padding: 12px 18px; box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-            z-index: 4000; display: flex; align-items: center; justify-content: space-between;
-            transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .player.visible { transform: translateY(0); }
-        .p-left { display: flex; align-items: center; gap: 15px; overflow: hidden; flex: 1; }
-        .p-img { width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0; object-fit: contain; background: #000; border: 1px solid #333; }
-        .p-info { overflow: hidden; }
-
-        .p-info h4 { 
-            margin: 0; font-size: 14px; color: #fff; font-weight: 700;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; text-overflow: ellipsis; 
-        }
-        .track-title { 
-            font-size: 11px; color: var(--y); font-weight: 600; margin-top: 2px;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; text-overflow: ellipsis; 
-        }
-
-        .p-btn { background: var(--y); color: #000; border: 0; width: 42px; height: 42px; border-radius: 50%; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 15px rgba(241,196,15,0.3); transition: 0.2s; }
-
-        /* FULL PLAYER - FIXED & SCROLL FREE */
-        #full-player {
-            position: fixed; top: 0; left: 0; width: 100%; 
-            height: 100dvh; /* Dynamic Viewport Height */
-            background: linear-gradient(to bottom, #1a1a1a, #000); 
-            z-index: 9000;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+        header {
             text-align: center;
-            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0, 1);
-            overflow: hidden; /* Prevent scrolling */
-            overscroll-behavior: none;
-        }
-        #full-player.active { transform: translateY(0); }
-
-        .fp-header { width: 100%; height: 70px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .close-fp { font-size: 26px; color: #fff; padding: 20px; cursor: pointer; opacity: 0.8; }
-        .menu-dots { font-size: 18px; color: #fff; padding: 20px; cursor: pointer; opacity: 0.8; transition: 0.2s; }
-        
-        /* Flex container for the image to scale */
-        .fp-content-wrap {
-            flex: 1; width: 100%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; overflow: hidden;
-            padding: 10px 0;
+            padding: 40px 20px;
         }
 
-        .fp-img-container { 
-            width: 70vw; height: 70vw; max-width: 300px; max-height: 300px; 
-            position: relative; margin-bottom: 20px; flex-shrink: 1; 
-        }
-        .fp-img { width: 100%; height: 100%; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); object-fit: contain; background: #080808; border: 1px solid #222; }
-        .fp-img.pulsing { animation: pulse-shadow 2.5s infinite ease-in-out; }
-        @keyframes pulse-shadow { 0% { box-shadow: 0 20px 40px rgba(241,196,15,0); } 50% { box-shadow: 0 25px 60px rgba(241,196,15,0.25); } 100% { box-shadow: 0 20px 40px rgba(241,196,15,0); } }
-
-        .fp-info { width: 100%; padding: 0 20px; margin-bottom: 10px; flex-shrink: 0; }
-        .fp-info h2 { 
-            color: white; font-size: 24px; margin: 0 0 8px; font-weight: 800; letter-spacing: -0.5px; 
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; text-overflow: ellipsis;
-        }
-        .fp-info div { 
-            font-size: 16px; color: var(--y); font-weight: 600; opacity: 0.9; text-shadow: 0 0 10px rgba(241,196,15,0.3); 
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; text-overflow: ellipsis;
+        header h1 {
+            font-size: 3rem;
+            margin: 0;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
         }
 
-        .visualizer { display: flex; gap: 5px; height: 30px; align-items: flex-end; justify-content: center; margin-bottom: 20px; flex-shrink: 0; }
-        .bar { width: 6px; background: var(--y); border-radius: 3px; height: 4px; opacity: 0.3; transition: height 0.1s; }
-        .playing .bar { animation: eq 0.6s infinite ease-in-out alternate; opacity: 1; box-shadow: 0 0 8px var(--y); }
-        .playing .bar:nth-child(1) { animation-delay: 0.0s; }
-        .playing .bar:nth-child(2) { animation-delay: 0.2s; }
-        .playing .bar:nth-child(3) { animation-delay: 0.4s; }
-        .playing .bar:nth-child(4) { animation-delay: 0.1s; }
-        .playing .bar:nth-child(5) { animation-delay: 0.3s; }
-        @keyframes eq { 0% { height: 4px; } 100% { height: 28px; } }
-
-        .controls-area {
-            width: 100%; padding-bottom: 30px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
-            background: linear-gradient(to top, #000 20%, transparent);
+        .main-container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
 
-        .controls { 
-            display: flex; align-items: center; justify-content: center; 
-            gap: 40px; margin-bottom: 30px; width: 100%;
+        .search-area {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
         }
-        .big-play { 
-            width: 80px; height: 80px; border-radius: 50%; background: var(--y); 
-            color: #000; font-size: 30px; display: flex; align-items: center; justify-content: center; 
-            border: none; cursor: pointer; box-shadow: 0 0 30px rgba(241,196,15,0.4); 
-            transition: transform 0.15s; position: relative; z-index: 2;
+
+        input {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
         }
-        .big-play:active { transform: scale(0.9); }
-        .sec-btn { color: #fff; font-size: 24px; cursor: pointer; opacity: 0.6; transition: 0.2s; width: 40px; text-align: center; }
-        .sec-btn:hover { opacity: 1; color: var(--y); }
 
-        .fa-spinner { animation: fa-spin 1s linear infinite; }
+        input:focus { outline: 2px solid var(--nexus-neon); }
 
-        .vol-wrap { width: 80%; max-width: 300px; display: flex; align-items: center; gap: 20px; color: #666; }
-        input[type=range] { -webkit-appearance: none; width: 100%; height: 5px; background: #333; border-radius: 100px; outline: none; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #fff; border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-
-        #opt-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9500;
-            display: none; align-items: flex-end; justify-content: center;
-            backdrop-filter: blur(8px);
+        .station-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
-        #opt-overlay.show { display: flex; }
-        .opt-box {
-            width: 100%; max-width: 500px; background: #121212; 
-            border-top-left-radius: 30px; border-top-right-radius: 30px;
-            padding: 25px 20px 40px; border-top: 1px solid var(--glass-border);
-            animation: slideUp 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-            box-shadow: 0 -10px 50px rgba(0,0,0,0.9);
-            max-height: 85vh; overflow-y: auto;
+
+        .station-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
         }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .opt-title { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 25px; text-align: center; letter-spacing: -0.5px; }
-
-        .opt-section { margin-bottom: 25px; background: rgba(255,255,255,0.03); border-radius: 16px; padding: 15px; }
-        .sec-head { color: var(--y); font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; display: flex; justify-content: space-between; }
-
-        .timer-display { 
-            text-align: center; font-size: 32px; font-weight: 700; color: #fff; margin: 10px 0 20px; font-feature-settings: "tnum"; 
-            display: none; 
+        .station-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-5px);
+            border-color: var(--nexus-neon);
         }
-        .timer-display.active { display: block; animation: pulseT 2s infinite; }
-        @keyframes pulseT { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        .grid-opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .opt-btn { 
-            background: rgba(255,255,255,0.1); border: 0; color: #fff; padding: 12px 0; border-radius: 10px; 
-            font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+        .station-card.active {
+            background: rgba(0, 210, 255, 0.1);
+            border-color: var(--nexus-neon);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
         }
-        .opt-btn:active, .opt-btn.sel { background: var(--y); color: #000; }
-        .btn-danger { background: rgba(231, 76, 60, 0.2); color: var(--danger); grid-column: 1 / -1; margin-top: 5px; }
-        .btn-danger:active { background: var(--danger); color: #fff; }
 
-        .row-opt { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
-        .row-lbl { color: #ddd; font-size: 15px; font-weight: 500; }
-        .tgl { position: relative; display: inline-block; width: 50px; height: 28px; }
-        .tgl input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--y); }
-        input:checked + .slider:before { transform: translateX(22px); background-color: #000; }
+        .station-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            object-fit: cover;
+        }
 
-        .opt-close-btn { width: 100%; padding: 15px; background: transparent; border: 1px solid #333; color: #888; border-radius: 15px; font-size: 16px; margin-top: 10px; }
+        .player-bar {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
 
+        .now-playing {
+            text-align: center;
+        }
+
+        .now-playing h3 { margin: 0; color: var(--nexus-neon); }
+
+        audio {
+            width: 100%;
+            height: 40px;
+            filter: invert(100%) hue-rotate(180deg) brightness(1.5);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="bg-anim"></div>
-
-    <div class="t-wrap">
-        <div class="t-l"><i class="fas fa-bolt" style="margin-right:6px;"></i> NEWS</div>
-        <div class="t-container"><div class="t-c" id="ticker-content">+++ NEXUSFM +++</div></div>
-    </div>
-
-    <div id="overlay" onclick="toggleMenu()"></div>
-    
-    <div id="sidebar">
-        <h2 style="color:var(--y); margin-bottom: 40px; font-size:26px; letter-spacing:-1px; display:flex; align-items:center; gap:10px;">
-            <img src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" style="height:30px;"> NEXUS
-        </h2>
-        <div class="side-item active" onclick="showPage('radio')"><i class="fas fa-broadcast-tower"></i> Radio Player</div>
-        <div class="side-item" onclick="showPage('favorites')"><i class="fas fa-heart"></i> Favoriten</div>
-        <div class="side-item" onclick="showPage('rcs')"><i class="fas fa-newspaper"></i> Nachrichten</div>
-        <div class="side-item" onclick="showPage('about')"><i class="fas fa-info-circle"></i> Über uns</div>
-
-        <div style="flex: 1;"></div>
-
-        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; text-align: center; margin-bottom: 20px;">
-            <i class="fas fa-exclamation-triangle" style="color: var(--y); font-size: 24px; margin-bottom: 10px; opacity: 0.8;"></i>
-            
-            <p style="font-size: 11px; color: #aaa; margin: 0 0 15px 0; line-height: 1.4;">
-                Dies ist eine Demo-Version und ist keine öffentliche Version und es kann zu Bugs kommen. Diese Version bietet kein gutes Benutzererlebnis.
-            </p>
-            
-            <a href="https://nexusfm-cdcr.vercel.app/" style="display: block; background: var(--y); color: #000; text-decoration: none; padding: 10px 0; border-radius: 8px; font-weight: 700; font-size: 12px; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-                Zur öffentlichen Version wechseln
-            </a>
-        </div>
-    </div>
     <header>
-        <i class="fas fa-bars menu-btn" onclick="toggleMenu()"></i>
-        <img src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" class="header-logo" alt="NexusFM">
+        <h1>NexusFM</h1>
+        <p>Connected Sound System</p>
     </header>
 
-    <div id="page-radio" class="page active">
-        <div class="s-box">
-            <div class="s-in">
-                <input type="text" id="sin" placeholder="Sender suchen..." onkeydown="if(event.key==='Enter') search()">
-                <button class="s-btn" onclick="search()"><i class="fas fa-search"></i></button>
-                <button class="s-btn" onclick="playRandom()" style="margin-left:8px;" title="Zufälliger Sender"><i class="fas fa-dice"></i></button>
-            </div>
-        </div>
-        <div class="grid" id="g"></div>
-    </div>
-
-    <div id="page-favorites" class="page">
-        <h2 style="color:var(--y); padding-left:5px;">Deine Favoriten</h2>
-        <div class="grid" id="fav-grid">Noch keine Favoriten gespeichert.</div>
-    </div>
-
-    <div id="page-rcs" class="page">
-        <h2 style="color:var(--y); padding-left:5px;">Aktuelle News</h2>
-        <div id="news-feed">Lade Nachrichten...</div>
-    </div>
-
-    <div id="page-about" class="page">
-        <h2 style="color:var(--y); padding-left:5px;">Über NexusFM</h2>
-        
-        <div class="about-box" style="text-align: center;">
-            <img src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" style="width: 80px; margin-bottom: 15px; border-radius: 50%;">
-            <p style="font-size: 16px; margin-bottom: 20px;">Das Radio-Erlebnis der nächsten Generation.</p>
-            <a href="https://nexus-ashy.vercel.app/" target="_blank" class="about-link">Mehr von uns besuchen <i class="fas fa-external-link-alt" style="margin-left:5px; font-size:12px;"></i></a>
+    <div class="main-container">
+        <div class="search-area">
+            <input type="text" id="searchInput" placeholder="Genre, Name oder Stadt suchen...">
+            <button onclick="search()" style="background: var(--nexus-neon); color: #000; border:none; padding: 0 25px; border-radius: 12px; font-weight: bold; cursor: pointer;">Finden</button>
         </div>
 
-        <div class="about-box">
-            <h2 style="color:#fff; font-size:20px; margin-top:0;"><i class="fas fa-shield-alt" style="color:var(--y); margin-right:10px;"></i>Datenschutz</h2>
-            <div class="legal-text">
-                <p>Willkommen bei NexusFM. Der Schutz Ihrer Daten ist uns wichtig. Nachfolgend informieren wir Sie über den Umgang mit Daten in dieser Web-Application.</p>
-                
-                <h3>1. Datenerfassung</h3>
-                <p>Diese Anwendung speichert keine personenbezogenen Daten auf externen Servern. Einstellungen wie Favoriten, Lautstärke oder der Dark-Mode-Status werden ausschließlich lokal auf Ihrem Endgerät (Local Storage) gespeichert.</p>
-
-                <h3>2. Audio-Streaming</h3>
-                <p>Beim Abspielen eines Radiosenders wird eine direkte Verbindung zwischen Ihrem Gerät und dem Server des jeweiligen Senders hergestellt. Hierbei wird Ihre IP-Adresse an den Sender übermittelt, was technisch für das Streaming notwendig ist.</p>
-
-                <h3>3. Externe Inhalte</h3>
-                <p>Nachrichten und Bilder werden über öffentliche APIs geladen. Hierbei gelten die Datenschutzbestimmungen der jeweiligen Anbieter.</p>
-                
-                <p style="margin-top:20px; font-style:italic;">Stand: Februar 2026.</p>
+        <div class="station-grid" id="grid">
             </div>
+
+        <div class="player-bar">
+            <div class="now-playing">
+                <small>AKTUELLER STREAM</small>
+                <h3 id="displayTitle">Wähle deinen Beat</h3>
+            </div>
+            <audio id="mainPlayer" controls></audio>
         </div>
     </div>
-
-    <div id="news-detail">
-        <div class="news-header-bar" onclick="closeNewsDetail()">
-            <i class="fas fa-arrow-left"></i> <span style="margin-left:10px; font-size:16px;">ZURÜCK</span>
-        </div>
-        <div class="news-content-scroll" id="detail-body"></div>
-    </div>
-
-    <div class="player" id="mini-player" onclick="openFull()">
-        <div class="p-left">
-            <img id="pi" src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" class="p-img">
-            <div class="p-info">
-                <h4 id="pn">NexusFM</h4>
-                <div class="track-title" id="track-info">Bereit</div>
-            </div>
-        </div>
-        <button class="p-btn" onclick="event.stopPropagation(); toggle();"><i class="fas fa-play" id="pt"></i></button>
-    </div>
-
-    <div id="full-player">
-        <div class="fp-header">
-            <i class="fas fa-chevron-down close-fp" onclick="closeFull()"></i>
-            <span style="color:#888; font-size:12px; font-weight:700; letter-spacing:1px;">NOW PLAYING</span>
-            <i class="fas fa-ellipsis-v menu-dots" onclick="openOpts()"></i>
-        </div>
-
-        <div class="fp-content-wrap">
-            <div class="fp-img-container">
-                <img id="f-img" src="https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn" class="fp-img">
-            </div>
-
-            <div class="fp-info">
-                <h2 id="f-name">NexusFM</h2>
-                <div id="f-track">Wähle einen Sender</div>
-            </div>
-
-            <div class="visualizer" id="viz">
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-            </div>
-        </div>
-
-        <div class="controls-area">
-            <div class="controls">
-                <div style="width: 40px;"></div> 
-
-                <button class="big-play" onclick="toggle()"><i class="fas fa-play" id="pt-f"></i></button>
-
-                <i class="fas fa-heart sec-btn" id="fp-fav" onclick="toggleCurrentFav()"></i>
-            </div>
-
-            <div class="vol-wrap">
-                <i class="fas fa-volume-down" style="font-size:14px;"></i>
-                <input type="range" min="0" max="1" step="0.01" value="1" oninput="setVolume(this.value)">
-                <i class="fas fa-volume-up" style="font-size:14px;"></i>
-            </div>
-        </div>
-    </div>
-
-    <div id="opt-overlay" onclick="closeOpts()">
-        <div class="opt-box" onclick="event.stopPropagation()">
-            <div class="opt-title">Einstellungen</div>
-
-            <div class="opt-section">
-                <div class="sec-head">
-                    <span><i class="fas fa-moon"></i> Sleep Timer</span>
-                    <span id="st-status" style="color:#888;">AUS</span>
-                </div>
-                <div id="st-display" class="timer-display">00:00</div>
-                <div class="grid-opts">
-                    <button class="opt-btn" onclick="setSleep(15)">15m</button>
-                    <button class="opt-btn" onclick="setSleep(30)">30m</button>
-                    <button class="opt-btn" onclick="setSleep(45)">45m</button>
-                    <button class="opt-btn" onclick="setSleep(60)">60m</button>
-                    <button class="opt-btn btn-danger" id="st-cancel" style="display:none;" onclick="cancelSleep()">Timer ausschalten</button>
-                </div>
-            </div>
-
-            <div class="opt-section">
-                <div class="sec-head">
-                    <span><i class="fas fa-sliders-h"></i> Equalizer & Sound</span>
-                </div>
-                <div style="font-size:11px; color:#666; margin-bottom:10px;">Funktioniert nur bei unterstützten Sendern.</div>
-                <div class="grid-opts">
-                    <button class="opt-btn eq-btn sel" onclick="setEQ('flat', this)">Normal</button>
-                    <button class="opt-btn eq-btn" onclick="setEQ('bass', this)">Bass</button>
-                    <button class="opt-btn eq-btn" onclick="setEQ('voice', this)">Stimme</button>
-                    <button class="opt-btn eq-btn" onclick="setEQ('treble', this)">Klar</button>
-                </div>
-            </div>
-
-            <div class="opt-section">
-                <div class="sec-head"><span><i class="fas fa-cog"></i> System</span></div>
-
-                <div class="row-opt">
-                    <div class="row-lbl">Datensparmodus (Low Quality Bilder)</div>
-                    <label class="tgl">
-                        <input type="checkbox" id="data-saver" onchange="toggleDataSaver(this)">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <button class="opt-close-btn" onclick="closeOpts()">Schließen</button>
-        </div>
-    </div>
-
-    <audio id="a" crossorigin="anonymous"></audio>
 
     <script>
-        const a = document.getElementById('a');
-        const defaultLogo = "https://lh3.googleusercontent.com/d/1l5YvIoAXCWoAPNF7gD7ZAZ_0Bh3H8wvn";
-        let currentStation = null, metaInt;
-        let favorites = JSON.parse(localStorage.getItem('nexus_favs')) || [];
-        let newsData = [];
+        const player = document.getElementById('mainPlayer');
+        const grid = document.getElementById('grid');
+        const displayTitle = document.getElementById('displayTitle');
+        let currentStationName = "NexusFM";
 
-        let sleepTimerId = null, sleepIntervalId = null, sleepEndTime = null;
-        let dataSaverMode = localStorage.getItem('nexus_datasaver') === 'true';
-
-        let audioCtx, sourceNode, gainNode;
-        let bassFilter, midFilter, trebleFilter;
-        let isAudioCtxInit = false;
-
-        const els = {
-            g: document.getElementById('g'),
-            favG: document.getElementById('fav-grid'),
-            mini: document.getElementById('mini-player'),
-            full: document.getElementById('full-player'),
-            pn: document.getElementById('pn'), fn: document.getElementById('f-name'),
-            pi: document.getElementById('pi'), fi: document.getElementById('f-img'),
-            ti: document.getElementById('track-info'), ft: document.getElementById('f-track'),
-            pt: document.getElementById('pt'), ptf: document.getElementById('pt-f'),
-            viz: document.getElementById('viz'), nd: document.getElementById('news-detail'),
-            fpFav: document.getElementById('fp-fav'), overlay: document.getElementById('overlay'),
-            sidebar: document.getElementById('sidebar'), opts: document.getElementById('opt-overlay'),
-            stDisplay: document.getElementById('st-display'),
-            stStatus: document.getElementById('st-status'),
-            stCancel: document.getElementById('st-cancel'),
-            saverCheck: document.getElementById('data-saver')
+        // Initialisierung
+        window.onload = () => {
+            fetchStations('https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/de?limit=100&order=clickcount&reverse=true');
         };
 
-        els.saverCheck.checked = dataSaverMode;
-
-        // MEDIA SESSION & BACKGROUND PLAYBACK SETUP
-        if ('mediaSession' in navigator) {
-            navigator.mediaSession.setActionHandler('play', () => toggle());
-            navigator.mediaSession.setActionHandler('pause', () => toggle());
-            navigator.mediaSession.setActionHandler('stop', () => { a.pause(); updatePlayIcons(false); });
-        }
-
-        a.addEventListener('waiting', () => {
-            els.pt.className = "fas fa-spinner fa-spin";
-            els.ptf.className = "fas fa-spinner fa-spin";
-        });
-
-        a.addEventListener('playing', () => {
-            updatePlayIcons(true);
-            updateMediaSessionState("playing");
-        });
-
-        a.addEventListener('pause', () => {
-            updatePlayIcons(false);
-            updateMediaSessionState("paused");
-        });
-
-        function toggleMenu() {
-            els.sidebar.classList.toggle('open');
-            if(els.sidebar.classList.contains('open')) {
-                els.overlay.style.display = 'block';
-                setTimeout(() => els.overlay.classList.add('show'), 10);
-            } else {
-                els.overlay.classList.remove('show');
-                setTimeout(() => els.overlay.style.display = 'none', 300);
-            }
-        }
-
-        function showPage(pid) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.side-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('page-' + pid).classList.add('active');
-
-            const items = document.querySelectorAll('.side-item');
-            if(pid === 'radio') items[0].classList.add('active');
-            if(pid === 'favorites') items[1].classList.add('active');
-            if(pid === 'rcs') items[2].classList.add('active');
-            if(pid === 'about') items[3].classList.add('active');
-
-            toggleMenu();
-            if(pid === 'favorites') loadFavs();
-            if(pid === 'rcs' && newsData.length === 0) fetchNews();
-        }
-
-        async function load(q = "") {
-            els.g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#666;">Lade Sender...</div>';
-            let url = 'https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/de?limit=60&order=clickcount&reverse=true';
-            if(q) url = `https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(q)}?limit=60`;
-
+        async function fetchStations(url) {
+            grid.innerHTML = "<p>Initialisiere Nexus-Netzwerk...</p>";
             try {
-                const r = await fetch(url);
-                const d = await r.json();
-                els.g.innerHTML = "";
-                d.forEach(s => els.g.appendChild(createCard(s)));
-            } catch(e) { els.g.innerHTML = "Fehler beim Laden."; }
-        }
-
-        function createCard(s) {
-            const div = document.createElement('div');
-            const isFav = favorites.some(f => f.stationuuid === s.stationuuid);
-            div.className = 'card';
-            if(currentStation && s.stationuuid === currentStation.stationuuid) div.classList.add('playing');
-            const logo = s.favicon || defaultLogo;
-            div.innerHTML = `
-                <i class="fas fa-heart fav-icon ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav('${s.stationuuid}', this)"></i>
-                <img src="${logo}" onerror="this.src='${defaultLogo}'">
-                <span>${s.name}</span>
-            `;
-            div.dataset.station = JSON.stringify(s);
-            div.onclick = () => playStation(s);
-            return div;
-        }
-
-        function playStation(s) {
-            initAudioContext();
-            currentStation = s;
-            a.src = s.url_resolved;
-            els.pt.className = els.ptf.className = "fas fa-spinner fa-spin";
-            a.play().catch(e => console.log("Play error", e));
-            els.mini.classList.add('visible');
-            els.pn.innerText = els.fn.innerText = s.name;
-            let logoUrl = s.favicon || defaultLogo;
-            els.pi.src = logoUrl;
-            els.fi.src = logoUrl; 
-            els.ti.innerText = els.ft.innerText = "Lade Stream...";
-            updateFavIconInFullPlayer(s.stationuuid);
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('playing'));
-            updateMediaSessionMetadata(s.name, "NexusFM Radio", logoUrl);
-            startMetaLoop();
-        }
-
-        // NEU: Zufalls-Sender Funktion
-        async function playRandom() {
-            const btn = document.querySelector('.fa-dice').parentElement;
-            const originalIcon = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-            // Hole Top 100 Sender, damit wir keinen "toten" Sender erwischen
-            const url = 'https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/de?limit=100&order=clickcount&reverse=true';
-
-            try {
-                const r = await fetch(url);
-                const d = await r.json();
-                if (d.length > 0) {
-                    const randomStation = d[Math.floor(Math.random() * d.length)];
-                    playStation(randomStation);
-                }
-            } catch(e) {
-                console.error("Random play failed", e);
-            } finally {
-                btn.innerHTML = originalIcon;
-            }
-        }
-
-        function initAudioContext() {
-            if(isAudioCtxInit) return;
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
-                sourceNode = audioCtx.createMediaElementSource(a);
-                bassFilter = audioCtx.createBiquadFilter();
-                bassFilter.type = 'lowshelf';
-                bassFilter.frequency.value = 200;
-                midFilter = audioCtx.createBiquadFilter();
-                midFilter.type = 'peaking';
-                midFilter.frequency.value = 1000;
-                midFilter.Q.value = 1;
-                trebleFilter = audioCtx.createBiquadFilter();
-                trebleFilter.type = 'highshelf';
-                trebleFilter.frequency.value = 3000;
-                sourceNode.connect(bassFilter);
-                bassFilter.connect(midFilter);
-                midFilter.connect(trebleFilter);
-                trebleFilter.connect(audioCtx.destination);
-                isAudioCtxInit = true;
-            } catch(e) { }
-        }
-
-        function setEQ(mode, btn) {
-            document.querySelectorAll('.eq-btn').forEach(b => b.classList.remove('sel'));
-            btn.classList.add('sel');
-            if(!isAudioCtxInit) return;
-            bassFilter.gain.value = 0; midFilter.gain.value = 0; trebleFilter.gain.value = 0;
-            switch(mode) {
-                case 'bass': bassFilter.gain.value = 10; break;
-                case 'voice': bassFilter.gain.value = -5; midFilter.gain.value = 5; trebleFilter.gain.value = 2; break;
-                case 'treble': bassFilter.gain.value = -2; trebleFilter.gain.value = 8; break;
-            }
-        }
-
-        function setSleep(min) {
-            cancelSleep();
-            const duration = min * 60 * 1000;
-            sleepEndTime = Date.now() + duration;
-            els.stDisplay.classList.add('active');
-            els.stStatus.innerText = "AKTIV";
-            els.stStatus.style.color = "var(--y)";
-            els.stCancel.style.display = 'block';
-            updateSleepUI();
-            sleepIntervalId = setInterval(updateSleepUI, 1000);
-            sleepTimerId = setTimeout(() => { a.pause(); updatePlayIcons(false); cancelSleep(); alert("NexusFM: Sleep Timer abgelaufen."); }, duration);
-        }
-
-        function updateSleepUI() {
-            if(!sleepEndTime) return;
-            const diff = sleepEndTime - Date.now();
-            if(diff <= 0) return;
-            const m = Math.floor(diff / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-            els.stDisplay.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
-        }
-
-        function cancelSleep() {
-            if(sleepTimerId) clearTimeout(sleepTimerId);
-            if(sleepIntervalId) clearInterval(sleepIntervalId);
-            sleepTimerId = sleepIntervalId = sleepEndTime = null;
-            els.stDisplay.classList.remove('active');
-            els.stDisplay.innerText = "00:00";
-            els.stStatus.innerText = "AUS";
-            els.stStatus.style.color = "#888";
-            els.stCancel.style.display = 'none';
-        }
-
-        function toggleDataSaver(checkbox) {
-            dataSaverMode = checkbox.checked;
-            localStorage.setItem('nexus_datasaver', dataSaverMode);
-        }
-
-        function updateMediaSessionMetadata(title, artist, artworkUrl) {
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    // HIER IST DIE KORREKTUR: Komma am Ende hinzugefügt
-                    title: "Jetzt läuft: " + title + " | NexusFM",
-                    artist: artist,
-                    artwork: [
-                        { src: artworkUrl, sizes: '96x96', type: 'image/png' },
-                        { src: artworkUrl, sizes: '128x128', type: 'image/png' },
-                        { src: artworkUrl, sizes: '192x192', type: 'image/png' },
-                        { src: artworkUrl, sizes: '512x512', type: 'image/png' }
-                    ]
-                });
-            }
-        }
-
-        function updateMediaSessionState(state) {
-            if('mediaSession' in navigator) {
-                navigator.mediaSession.playbackState = state;
-            }
-        }
-
-        function toggle() {
-            if(!a.src) return;
-            if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-            
-            if(a.paused) { 
-                // CRITICAL FIX: Reload Stream on Resume to get Live Edge
-                // This fixes the issue where playback stops after pausing
-                const currentSrc = a.src;
-                a.src = "";
-                a.src = currentSrc;
-                a.load();
-                a.play(); 
-                updatePlayIcons(true); 
-            } 
-            else { 
-                a.pause(); 
-                updatePlayIcons(false); 
-            }
-        }
-
-        function updatePlayIcons(isPlaying) {
-            const cls = isPlaying ? "fas fa-pause" : "fas fa-play";
-            if (a.readyState >= 3 || a.paused) {
-                els.pt.className = els.ptf.className = cls;
-            }
-            if(isPlaying) {
-                els.viz.classList.add('playing');
-                if(!dataSaverMode) els.fi.classList.add('pulsing');
-            } else {
-                els.viz.classList.remove('playing');
-                els.fi.classList.remove('pulsing');
-            }
-        }
-
-        function setVolume(val) { a.volume = val; }
-        function openFull() { els.full.classList.add('active'); document.body.style.overflow = 'hidden'; }
-        function closeFull() { els.full.classList.remove('active'); document.body.style.overflow = ''; }
-        function openOpts() { els.opts.classList.add('show'); }
-        function closeOpts() { els.opts.classList.remove('show'); }
-
-        function startMetaLoop() {
-            if(metaInt) clearInterval(metaInt);
-            checkMetadata();
-            metaInt = setInterval(checkMetadata, 15000);
-        }
-
-        async function checkMetadata() {
-            if (!currentStation || a.paused) return;
-            try {
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://de1.api.radio-browser.info/json/stations/byuuid/${currentStation.stationuuid}`)}`);
+                const res = await fetch(url);
                 const data = await res.json();
-                const sData = JSON.parse(data.contents);
-                const song = sData[0].last_song || "NexusFM";
-                els.ti.innerText = els.ft.innerText = song;
+                renderStations(data);
+            } catch (e) {
+                grid.innerHTML = "<p>Verbindung unterbrochen.</p>";
+            }
+        }
+
+        function renderStations(stations) {
+            grid.innerHTML = "";
+            stations.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'station-card';
+                const img = s.favicon ? s.favicon : 'https://cdn-icons-png.flaticon.com/512/1077/1077114.png';
                 
-                // Update Notification Artist/Title dynamically
-                if ('mediaSession' in navigator) {
-                    navigator.mediaSession.metadata.artist = song;
-                }
-            } catch (e) { }
+                card.innerHTML = `
+                    <img src="${img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3612/3612503.png'">
+                    <div style="font-weight:bold; font-size: 0.9em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${s.name}</div>
+                `;
+                
+                card.onclick = () => {
+                    play(s.url_resolved, s.name);
+                    document.querySelectorAll('.station-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                };
+                grid.appendChild(card);
+            });
         }
 
-        function toggleFav(uuid, icon) {
-            const station = JSON.parse(icon.parentElement.dataset.station);
-            handleFavLogic(station, uuid);
-            icon.classList.toggle('active');
-            updateFavIconInFullPlayer(uuid);
+        function play(url, name) {
+            currentStationName = name;
+            displayTitle.innerText = name;
+            player.src = url;
+            player.play();
+            updateTitle();
         }
 
-        function toggleCurrentFav() {
-            if(!currentStation) return;
-            handleFavLogic(currentStation, currentStation.stationuuid);
-            updateFavIconInFullPlayer(currentStation.stationuuid);
-            if(document.getElementById('page-favorites').classList.contains('active')) loadFavs();
-            load(document.getElementById('sin').value); 
+        function search() {
+            const term = document.getElementById('searchInput').value;
+            fetchStations(`https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(term)}?limit=100`);
         }
 
-        function handleFavLogic(station, uuid) {
-            const idx = favorites.findIndex(f => f.stationuuid === uuid);
-            if(idx > -1) { favorites.splice(idx, 1); } 
-            else { favorites.push(station); }
-            localStorage.setItem('nexus_favs', JSON.stringify(favorites));
-        }
-
-        function updateFavIconInFullPlayer(uuid) {
-            const isFav = favorites.some(f => f.stationuuid === uuid);
-            els.fpFav.style.color = isFav ? "var(--y)" : "#fff";
-        }
-
-        function loadFavs() {
-            els.favG.innerHTML = "";
-            if(favorites.length === 0) {
-                els.favG.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#666;padding:20px;">Keine Favoriten gespeichert.</div>';
-                return;
+        // Tab-Titel Update (Visibility API)
+        function updateTitle() {
+            if (document.hidden) {
+                document.title = "🎶 " + currentStationName;
+            } else {
+                document.title = "NexusFM | " + currentStationName;
             }
-            favorites.forEach(s => els.favG.appendChild(createCard(s)));
         }
 
-        async function fetchNews() {
-            try {
-                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://www.tagesschau.de/infoservices/alle-meldungen-100~rss2.xml')}`);
-                const data = await res.json();
-                if (data.status === 'ok') {
-                    newsData = data.items;
-                    document.getElementById('ticker-content').textContent = `+++ ${newsData.slice(0, 5).map(i => i.title.toUpperCase()).join(' +++ ')} +++ `;
-                    renderNews();
-                }
-            } catch (e) { }
-        }
+        document.addEventListener("visibilitychange", updateTitle);
 
-        function renderNews() {
-            document.getElementById('news-feed').innerHTML = newsData.map((item, index) => `
-                <div class="news-card" onclick="openNewsDetail(${index})">
-                    <h3>${item.title}</h3>
-                    <p>${item.pubDate.split(' ')[1]} Uhr</p>
-                </div>
-            `).join('');
-        }
-
-        function openNewsDetail(index) {
-            const item = newsData[index];
-            let img = item.enclosure.link;
-            if(dataSaverMode) img = "";
-            document.getElementById('detail-body').innerHTML = `
-                <h2 style="color:#fff; margin-top:0;">${item.title}</h2>
-                <p style="color:var(--y); font-size:14px; margin-bottom:20px;">${item.pubDate}</p>
-                ${img ? `<img src="${img}" style="width:100%; border-radius:15px; margin-bottom:20px; border:1px solid #333;">` : ''}
-                <p style="color:#ddd; line-height:1.6; font-size:18px;">${item.description}</p>
-                <br><a href="${item.link}" target="_blank" style="color:var(--y); text-decoration:none;">Ganzen Artikel lesen →</a>
-            `;
-            els.nd.style.display = 'flex';
-            setTimeout(() => els.nd.classList.add('active'), 10);
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeNewsDetail() {
-            els.nd.classList.remove('active');
-            setTimeout(() => els.nd.style.display = 'none', 300);
-            document.body.style.overflow = '';
-        }
-
-        function search() { load(document.getElementById('sin').value); }
-
-        fetchNews();
-        load();
+        // Enter-Taste für Suche
+        document.getElementById('searchInput').addEventListener("keypress", (e) => {
+            if (e.key === "Enter") search();
+        });
     </script>
-
-<div style="text-align: center; margin-top: 20px; padding: 10px;">
-    <p style="color: #888888; font-size: 12px; margin: 0;">
-        Version 164.01.15
-    </p>
-    <p style="color: #666666; font-size: 10px; margin-top: 5px; opacity: 0.7;">
-        By Nexus with ❤️
-    </p>
-</div>
-
 </body>
 </html>
